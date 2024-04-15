@@ -1,11 +1,10 @@
-import { TypeMap } from "./config";
 
 /**
  * 发布订阅模式
  */
-export default class Msgm {
+export default class Msgm<TypeMap> {
 
-    private __messageListMap: Map<unknown, IMessage<any>[]> = new Map();
+    private __messageListMap: Map<unknown, IMessage<any, TypeMap>[]> = new Map();
     private __messageId: number = 0;
 
     /**
@@ -15,9 +14,9 @@ export default class Msgm {
      * @param order 执行顺序 值越大优先级越高
      * @param id 唯一标识
      */
-    public on<TypeName extends TypeNames>(type: TypeName, cb: IMessageCb<TypeName>, order: number = 0): number {
+    public on<TypeName extends TypeNames<TypeMap>>(type: TypeName, cb: IMessageCb<TypeName, TypeMap>, order: number = 0): number {
         let messages = this.__messageListMap.get(type);
-        const message: IMessage<TypeName> = {
+        const message: IMessage<TypeName, TypeMap> = {
             cb: cb,
             id: ++this.__messageId,
             order: order,
@@ -35,14 +34,14 @@ export default class Msgm {
      * @param type 类型
      * @param cb 回调函数
      */
-    public off<TypeName extends TypeNames>(type: TypeName, cb: IMessageCb<TypeName>): void;
+    public off<TypeName extends TypeNames<TypeMap>>(type: TypeName, cb: IMessageCb<TypeName, TypeMap>): void;
     /**
      * 通过唯一标识注销消息
      * @param type 类型 
      * @param id 唯一标识
      */
-    public off<TypeName extends TypeNames>(type: TypeName, id: number): void;
-    public off<TypeName extends TypeNames>(type: TypeName, x: IMessageCb<TypeName> | number): void {
+    public off<TypeName extends TypeNames<TypeMap>>(type: TypeName, id: number): void;
+    public off<TypeName extends TypeNames<TypeMap>>(type: TypeName, x: IMessageCb<TypeName, TypeMap> | number): void {
         const messages = this.__messageListMap.get(type);
         if (!messages) return;
         let index = -1;
@@ -59,7 +58,7 @@ export default class Msgm {
      * @param type 类型
      * @param data 数据
      */
-    public emit<TypeName extends TypeNames>(type: TypeName, data: PayloadType<TypeName> = null!): void {
+    public emit<TypeName extends TypeNames<TypeMap>>(type: TypeName, data: PayloadType<TypeName, TypeMap> = null!): void {
         const messages = this.__messageListMap.get(type);
         if (!messages) return;
         messages.forEach((message) => {
@@ -72,16 +71,16 @@ export default class Msgm {
 /**
  * 消息回调接口
  */
-type IMessageCb<TypeName extends TypeNames> = (data: PayloadType<TypeName>) => void;
+type IMessageCb<TypeName extends TypeNames<TypeMap>, TypeMap> = (data: PayloadType<TypeName, TypeMap>) => void;
 /**
  * 消息对象接口
  */
-export interface IMessage<TypeName extends TypeNames> {
+export interface IMessage<TypeName extends TypeNames<TypeMap>, TypeMap> {
     /**
      * 回调函数
      * @param data 数据
      */
-    cb: IMessageCb<TypeName>;
+    cb: IMessageCb<TypeName, TypeMap>;
     /**
      * 唯一标识
      */
@@ -95,8 +94,30 @@ export interface IMessage<TypeName extends TypeNames> {
 /**
  * 类型
  */
-export type TypeNames = keyof TypeMap;
+export type TypeNames<TypeMap> = keyof TypeMap;
 /**
  * 参数类型
  */
-export type PayloadType<TypeName extends TypeNames> = TypeMap[TypeName];
+export type PayloadType<TypeName extends TypeNames<TypeMap>, TypeMap> = TypeMap[TypeName];
+
+/**
+ * 类型配置-测试
+ * 建议自己新建一个配置文件
+ */
+export interface TypeMap1 {
+    ["event"]: string;
+    ["hello"]: string;
+}
+
+export enum EType {
+    Create = "Create",
+    Destroy = "Destroy",
+}
+
+export interface TypeMap2 {
+    [EType.Create]: { name: string, age: number };
+    [EType.Destroy]: { name: string };
+}
+/**
+ * --------------------
+ */
