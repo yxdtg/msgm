@@ -1,0 +1,12 @@
+{
+  "name": "msgm",
+  "version": "0.1.2",
+  "description": "",
+  "main": "./msgm.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "yxdtg <2430877819@qq.com>",
+  "license": "MIT"
+}
