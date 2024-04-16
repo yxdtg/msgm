@@ -77,7 +77,9 @@ export default class Msgm<TypeMap> {
      */
     public emit<TypeName extends TypeNames<TypeMap>>(type: TypeName, data: PayloadType<TypeName, TypeMap> = null!): void {
         const messages = this.__messageListMap.get(type);
-        if (!messages) return;
+        if (!messages) {
+            return console.warn(`你正在尝试发射并不存在的消息, 消息类型: ${type as string}`);
+        }
         messages.forEach((message) => {
             if (message.target) {
                 message.cb.call(message.target, data);

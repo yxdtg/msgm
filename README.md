@@ -18,7 +18,7 @@ pnpm add msgm
 ### 推荐使用TypeScript 因为可以开箱即用以及更方便的配置类型
 ## 使用
 ```typescript
-// 导入 msgm 库 TypeMap1类型配置项
+// 导入 msgm类 以及 TypeMap1类型配置项
 // 建议自己新建一个配置文件
 import { Msgm, TypeMap1} from "msgm";
 
@@ -43,12 +43,19 @@ const id = msg.on("event", onEvent);
 msg.off("event", id);
 
 // 如果需要，可以设置消息优先级，值越大，优先级越高
-msg.on("hello", () => console.log("hello 1"), 1);
-msg.on("hello", () => console.log("hello 2"), 2);
-msg.on("hello", () => console.log("hello 3"), 3);
+msg.on("hello", () => console.log("hello 1"), null, 1);
+msg.on("hello", () => console.log("hello 2"), null, 2);
+msg.on("hello", () => console.log("hello 3"), null, 3);
 msg.emit("hello");
 // 这里打印结果为 hello 3 hello 2 hello 1
 
+// 注销一个消息类型的所有消息
+msg.offAll("event");
+
+// 注册并绑定回调目标 回调目标是在回调函数中的this指向
+msg.on("event", onEvent, this);
+// 注销
+msg.off("event", onEvent, this);
 ```
 ## 类型安全
 ### 打开msgm.ts文件
