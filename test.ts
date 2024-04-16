@@ -7,7 +7,7 @@ msg1.on("event", (data) => {
 msg1.emit("event", "hello");
 
 const msg2 = new Msgm<TypeMap2>();
-msg2.on(EType.Destroy, (data) => {
+msg2.on(EType.Create, (data) => {
     console.log(data);
 });
 msg2.emit(EType.Create, { name: "石头", age: 999 });
