@@ -2,7 +2,7 @@
 /**
  * 发布订阅模式
  */
-export default class Msgm<TypeMap> {
+export class Msgm<TypeMap> {
 
     private __messageListMap: Map<unknown, IMessage<any, TypeMap>[]> = new Map();
     private __messageId: number = 0;

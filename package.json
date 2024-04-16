@@ -1,11 +1,15 @@
 {
   "name": "msgm",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "",
   "main": "./msgm.ts",
-  "scripts": {
-  },
-  "keywords": [],
+  "scripts": {},
+  "keywords": [
+    "message",
+    "observer",
+    "publish",
+    "subscription"
+  ],
   "author": "yxdtg <2430877819@qq.com>",
   "license": "MIT"
 }

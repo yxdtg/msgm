@@ -1,4 +1,4 @@
-import Msgm, { EType, TypeMap1, TypeMap2 } from "./msgm";
+import { Msgm, EType, TypeMap1, TypeMap2 } from "./msgm";
 
 const msg1 = new Msgm<TypeMap1>();
 msg1.on("event", (data) => {
