@@ -7,15 +7,29 @@ export class Msgm<TypeMap> {
     private __messageListMap: Map<unknown, IMessage<any, TypeMap>[]> = new Map();
     private __messageId: number = 0;
 
+
+    /**
+     * 注册消息
+     * @param type 消息类型
+     * @param cb 回调函数
+     * @param order 优先级 值越大优先级越高
+     * @return 唯一标识
+     */
+    public on<TypeName extends TypeNames<TypeMap>>(type: TypeName, cb: IMessageCb<TypeName, TypeMap>, order?: number): number;
     /**
      * 注册消息
      * @param type 消息类型
      * @param cb 回调函数
      * @param target 回调目标
-     * @param order 执行顺序 值越大优先级越高
+     * @param order 优先级 值越大优先级越高
      * @return 唯一标识
      */
-    public on<TypeName extends TypeNames<TypeMap>>(type: TypeName, cb: IMessageCb<TypeName, TypeMap>, target: any = null, order: number = 0): number {
+    public on<TypeName extends TypeNames<TypeMap>>(type: TypeName, cb: IMessageCb<TypeName, TypeMap>, target?: any, order?: number): number;
+    public on<TypeName extends TypeNames<TypeMap>>(type: TypeName, cb: IMessageCb<TypeName, TypeMap>, target: any | number = null, order: number = 0): number {
+        if (typeof target === "number") {
+            order = target;
+            target = null;
+        }
         let messages = this.__messageListMap.get(type);
         const message: IMessage<TypeName, TypeMap> = {
             cb: cb,
@@ -44,30 +58,40 @@ export class Msgm<TypeMap> {
      * @param id 唯一标识
      */
     public off<TypeName extends TypeNames<TypeMap>>(type: TypeName, id: number): void;
-    public off<TypeName extends TypeNames<TypeMap>>(type: TypeName, x: IMessageCb<TypeName, TypeMap> | number, target: any = null): void {
-        const messages = this.__messageListMap.get(type);
-        if (!messages) return;
-        let index = -1;
-        if (typeof x === "number") {
-            index = messages.findIndex((message) => message.id === x);
-        } else {
-            if (target) {
-                index = messages.findIndex((message) => message.cb === x && message.target === target);
-            } else {
-                index = messages.findIndex((message) => message.cb === x);
-            }
-        }
-        if (index !== -1) messages.splice(index, 1);
-    }
-
     /**
      * 注销指定类型的所有消息
      * @param type 消息类型
      */
-    public offAll<TypeName extends TypeNames<TypeMap>>(type: TypeName): void {
-        if (this.__messageListMap.has(type)) {
+    public off<TypeName extends TypeNames<TypeMap>>(type: TypeName): void;
+    public off<TypeName extends TypeNames<TypeMap>>(type: TypeName, x: IMessageCb<TypeName, TypeMap> | number | null = null, target: any = null): void {
+        const messages = this.__messageListMap.get(type);
+        if (!messages) return;
+
+        if (x === null) {
             this.__messageListMap.delete(type);
+        } else {
+            let index = -1;
+            if (typeof x === "number") {
+                index = messages.findIndex((message) => message.id === x);
+            } else {
+                if (target) {
+                    index = messages.findIndex((message) => message.cb === x && message.target === target);
+                } else {
+                    index = messages.findIndex((message) => message.cb === x);
+                }
+            }
+            if (index !== -1) messages.splice(index, 1);
         }
+    }
+
+    /**
+     * @deprecated 注销指定类型的所有消息 虽然不建议使用 但是依旧可以使用
+     * 建议使用off方法
+     * @example msg.off(type);
+     * @param type 消息类型
+     */
+    public offAll<TypeName extends TypeNames<TypeMap>>(type: TypeName): void {
+        this.off(type);
     }
 
     /**
@@ -78,7 +102,8 @@ export class Msgm<TypeMap> {
     public emit<TypeName extends TypeNames<TypeMap>>(type: TypeName, data: PayloadType<TypeName, TypeMap> = null!): void {
         const messages = this.__messageListMap.get(type);
         if (!messages) {
-            return console.warn(`你正在尝试发射并不存在的消息, 消息类型: ${type as string}`);
+            // return console.warn(`你正在尝试发射并不存在的消息, 消息类型: ${type as string}`);
+            return;
         }
         messages.forEach((message) => {
             if (message.target) {

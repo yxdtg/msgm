@@ -4,19 +4,19 @@ msgm 是一个拥抱类型安全的发布订阅模式库 并且可以控制优�
 ## 安装
 npm
 ```bash
-npm install msgm
+npm i msgm
 ```
 yarn
 ```bash
-yarn add msgm
+yarn i msgm
 ```
 pnpm
 ```bash
-pnpm add msgm
+pnpm i msgm
 ```
 
-### 推荐使用TypeScript 因为可以开箱即用以及更方便的配置类型
-## 使用
+## 推荐使用TypeScript, 开箱即用 + 方便的类型配置
+### 初始化
 ```typescript
 // 导入 msgm类 以及 TypeMap1类型配置项
 // 建议自己新建一个配置文件
@@ -29,36 +29,58 @@ const msg = new Msgm<TypeMap1>();
 const onEvent = (data) => {
     console.log(`onEvent: ${data}`);
 };
+```
 
-// 注册
+### 注册
+```typescript
+// 基础注册
 msg.on("event", onEvent);
-// 注销
-msg.off("event", onEvent);
-// 发射
-msg.emit("event", "hello msgm");
 
-// 如果需要，注册消息可以返回消息唯一标识
+// 注册消息可以返回消息唯一标识
 const id = msg.on("event", onEvent);
-// 可以通过唯一标识来注销消息
+
+// 注册并绑定回调目标, 回调目标是在回调函数中的this指向
+msg.on("event", onEvent, this);
+
+// 可以设置消息优先级, 值越大, 优先级越高
+msg.on("hello", () => console.log("hello 1"), 1);
+msg.on("hello", () => console.log("hello 2"), 2);
+msg.on("hello", () => console.log("hello 3"), 3);
+// 这里发射打印结果为 hello 3 hello 2 hello 1
+```
+
+### 注销
+```typescript
+// 通过回调函数来注销消息
+msg.off("event", onEvent);
+
+// 通过唯一标识来注销消息
 msg.off("event", id);
 
-// 如果需要，可以设置消息优先级，值越大，优先级越高
-msg.on("hello", () => console.log("hello 1"), null, 1);
-msg.on("hello", () => console.log("hello 2"), null, 2);
-msg.on("hello", () => console.log("hello 3"), null, 3);
-msg.emit("hello");
-// 这里打印结果为 hello 3 hello 2 hello 1
+// 注销绑定回调目标的消息
+msg.off("event", onEvent, this);
 
 // 注销一个消息类型的所有消息
-msg.offAll("event");
-
-// 注册并绑定回调目标 回调目标是在回调函数中的this指向
-msg.on("event", onEvent, this);
-// 注销
-msg.off("event", onEvent, this);
+msg.off("event");
 ```
+
+### 发射
+```typescript
+// 发射消息
+msg.emit("event", "hello msgm");
+// 发射无数据消息
+msg.emit("event");
+```
+
+### 无类型 
+```typescript
+// 如果要使用无类型的发布订阅 那么也非常简单
+const msg = new Msgm<any>();
+// ...
+```
+
 ## 类型安全
-### 打开msgm.ts文件
+### 打开msgm.ts文件 到达文件底部
 #### 你大概会看到这样一些内容
 ```typescript
 /**
