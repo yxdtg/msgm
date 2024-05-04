@@ -8,11 +8,11 @@ npm i msgm
 ```
 yarn
 ```bash
-yarn i msgm
+yarn add msgm
 ```
 pnpm
 ```bash
-pnpm i msgm
+pnpm add msgm
 ```
 
 ## 推荐使用TypeScript, 开箱即用 + 方便的类型配置
@@ -41,6 +41,8 @@ const id = msg.on("event", onEvent);
 
 // 注册并绑定回调目标, 回调目标是在回调函数中的this指向
 msg.on("event", onEvent, this);
+// 绑定回调目标并且设置优先级
+msg.on("event", onEvent, this, 1);
 
 // 可以设置消息优先级, 值越大, 优先级越高
 msg.on("hello", () => console.log("hello 1"), 1);
@@ -78,6 +80,11 @@ msg.emit("event");
 const msg = new Msgm<any>();
 // ...
 ```
+## 如果不需要类型安全 推荐使用yxmsg库 它同样支持优先级控制
+
+### npm: https://www.npmjs.com/package/yxmsg
+### github: https://github.com/yxdtg/yxmsg
+
 
 ## 类型安全
 ### 打开msgm.ts文件 到达文件底部

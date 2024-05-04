@@ -7,7 +7,6 @@ export class Msgm<TypeMap> {
     private __messageListMap: Map<unknown, IMessage<any, TypeMap>[]> = new Map();
     private __messageId: number = 0;
 
-
     /**
      * 注册消息
      * @param type 消息类型
